@@ -51,10 +51,10 @@ if shiwake_file and template_file:
     # ✅ データ抽出
     # ===============================
     if mode == "原価":
-        df_target = df_all[df_all["要素内訳貸方勘定科目名称"].isin(["工事未払金", "買掛金"])].copy()
+        df_target = df_all[df_all["要素内訳貸方勘定科目名称"].isin(["工事未払金", "買掛金","未払金"])].copy()
         st.info("✅ 原価モードで貸方勘定科目が一致したデータを抽出します。")
     elif mode == "支払":
-        df_target = df_all[df_all["要素内訳借方勘定科目名称"] == "工事未払金"].copy()
+        df_target = df_all[df_all["要素内訳借方勘定科目名称"].isin(["工事未払金", "買掛金","未払金"])].copy()
         st.info("✅ 支払モードで借方勘定科目が一致したデータを抽出します。")
     elif mode == "売上":
         df_target = df_all[df_all["要素内訳借方勘定科目名称"].isin(["工事未収金", "未収入金"])].copy()
@@ -88,3 +88,4 @@ if shiwake_file and template_file:
         )
     else:
         st.warning("⚠️ 抽出対象のデータがありませんでした。")
+
