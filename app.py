@@ -121,7 +121,7 @@ if shiwake_file and template_file:
 
         df_target = df_all[cond_normal_receipt | cond_offset_receipt].copy()
 
-    st.info("✅ 入金モード：通常入金（現金/預金→売掛・未収）＋相殺（雑費・支払手数料→完成工事未収入金）を抽出します。")
+        st.info("✅ 入金モード：通常入金（現金/預金→売掛・未収）＋相殺（雑費・支払手数料→完成工事未収入金）を抽出します。")
 
     else:
         st.error("⚠️ 処理モードが不正です。")
@@ -152,6 +152,7 @@ if shiwake_file and template_file:
         )
     else:
         st.warning("⚠️ 抽出対象のデータがありませんでした。抽出条件（科目名）を見直してください。")
+
 
 
 
