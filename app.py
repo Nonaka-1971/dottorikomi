@@ -100,18 +100,28 @@ if shiwake_file and template_file:
 
     # ✅ 入金：借方が現金・預金系 AND 貸方が売掛・未収系（添付に「売掛金」「完成工事未収入金」あり）
     elif mode == "入金":
-        debit_name = _safe_str_series(df_all["要素内訳借方勘定科目名称"])
-        credit_name = _safe_str_series(df_all["要素内訳貸方勘定科目名称"])
+    debit_name = _safe_str_series(df_all["要素内訳借方勘定科目名称"])
+    credit_name = _safe_str_series(df_all["要素内訳貸方勘定科目名称"])
 
-        receipt_debit_pattern = r"(現金|預金)"  # 「普通預金」「定期預金」「個人預金」なども拾う
-        ar_credit_candidates = ["売掛金", "完成工事未収入金", "未収入金", "工事未収金"]
+    # ① 通常の入金：借方=現金/預金、貸方=売掛・未収系
+    receipt_debit_pattern = r"(現金|預金)"
+    ar_credit_candidates = ["売掛金", "完成工事未収入金", "未収入金", "工事未収金"]
 
-        df_target = df_all[
-            debit_name.str.contains(receipt_debit_pattern, regex=True, na=False)
-            & credit_name.isin(ar_credit_candidates)
-        ].copy()
+    cond_normal_receipt = (
+        debit_name.str.contains(receipt_debit_pattern, regex=True, na=False)
+        & credit_name.isin(ar_credit_candidates)
+    )
 
-        st.info("✅ 入金モード：借方が現金/預金、かつ貸方が売掛・未収系のデータを抽出します。")
+    # ② 追加したい仕訳：雑費/完成工事未収入金、支払手数料/完成工事未収入金
+    offset_debit_candidates = ["雑費", "支払手数料"]
+    cond_offset_receipt = (
+        credit_name.eq("完成工事未収入金")
+        & debit_name.isin(offset_debit_candidates)
+    )
+
+    df_target = df_all[cond_normal_receipt | cond_offset_receipt].copy()
+
+    st.info("✅ 入金モード：通常入金（現金/預金→売掛・未収）＋相殺（雑費・支払手数料→完成工事未収入金）を抽出します。")
 
     else:
         st.error("⚠️ 処理モードが不正です。")
@@ -142,4 +152,5 @@ if shiwake_file and template_file:
         )
     else:
         st.warning("⚠️ 抽出対象のデータがありませんでした。抽出条件（科目名）を見直してください。")
+
 
